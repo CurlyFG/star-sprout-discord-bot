@@ -220,8 +220,8 @@ class StreamMonitor {
             
             logger.info(`🌌 ${username} has ended their stream on ${platform}`);
             
-            // Optionally send stream ended notification
-            // await this.sendStreamEndedNotifications(platform, username, wasLive);
+            // Send stream ended notification
+            await this.sendStreamEndedNotifications(platform, username, wasLive);
         }
     }
 
