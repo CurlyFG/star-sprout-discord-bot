@@ -1,80 +1,42 @@
-# Deploying Star Sprout to Render
+# Star Sprout Discord Bot - Deployment Guide
 
-This guide will help you deploy Star Sprout to Render for 24/7 hosting.
+## Quick Fix for Build Error (Exit Code 127)
 
-## Prerequisites
+The deployment configuration has been updated to resolve the build issues:
 
-1. A GitHub account
-2. A Render account (free at render.com)
-3. Your API keys ready:
-   - Discord Bot Token
-   - Twitch Client ID and Secret
-   - YouTube API Key
+### Updated Files:
+- `render.yaml` - Fixed build command and Node.js configuration
+- `Procfile` - Added as backup deployment method
 
-## Step 1: Push to GitHub
+### Deployment Steps:
 
-1. Create a new repository on GitHub
-2. Clone this project or upload the files
-3. Push all files to your GitHub repository
+1. **Redeploy on Render:**
+   - Go to your Render dashboard
+   - Find your `star-sprout-bot` service
+   - Click "Manual Deploy" → "Deploy latest commit"
 
-## Step 2: Connect to Render
+2. **Environment Variables (Required):**
+   ```
+   DISCORD_BOT_TOKEN=your_bot_token
+   TWITCH_CLIENT_ID=your_twitch_client_id
+   TWITCH_CLIENT_SECRET=your_twitch_client_secret
+   YOUTUBE_API_KEY_NEW=your_fresh_youtube_key
+   NODE_ENV=production
+   ```
 
-1. Go to [render.com](https://render.com) and sign up/login
-2. Click "New +" and select "Web Service"
-3. Connect your GitHub account and select your Star Sprout repository
+3. **Alternative: Create New Service:**
+   If rebuild fails, create a new web service:
+   - Select your GitHub repository
+   - Render will auto-detect the configuration
+   - Choose "Free" plan
+   - Add environment variables
+   - Deploy
 
-## Step 3: Configure the Service
+### Features Ready:
+- ✅ Twitch live stream monitoring
+- ✅ YouTube live stream monitoring  
+- ✅ YouTube upload notifications
+- ✅ Multi-server Discord support
+- ✅ Themed notification messages
 
-**Service Settings:**
-- Name: `star-sprout-bot`
-- Environment: `Node`
-- Build Command: `npm install`
-- Start Command: `node index.js`
-- Plan: Free (sufficient for Discord bots)
-
-**Environment Variables:**
-Add these in the Environment section:
-- `DISCORD_BOT_TOKEN` = your Discord bot token
-- `TWITCH_CLIENT_ID` = your Twitch client ID
-- `TWITCH_CLIENT_SECRET` = your Twitch client secret
-- `YOUTUBE_API_KEY` = your YouTube API key
-- `NODE_ENV` = `production`
-
-## Step 4: Deploy
-
-1. Click "Create Web Service"
-2. Render will automatically build and deploy your bot
-3. The bot will be available at `https://your-service-name.onrender.com`
-
-## Health Check
-
-The bot includes health endpoints:
-- `/` - Shows bot status and uptime
-- `/health` - Health check for monitoring
-
-## Automatic Restarts
-
-Render automatically:
-- Restarts your bot if it crashes
-- Keeps it running 24/7
-- Provides logs for debugging
-- Updates when you push to GitHub
-
-## Free Tier Limitations
-
-Render's free tier:
-- May sleep after 15 minutes of inactivity
-- Limited to 750 hours per month
-- Sufficient for most Discord bots
-
-For guaranteed 24/7 uptime, upgrade to a paid plan ($7/month).
-
-## Monitoring
-
-Check your bot status:
-1. Visit your Render dashboard
-2. View logs in real-time
-3. Monitor performance metrics
-4. Set up alerts for downtime
-
-Your Star Sprout bot will now run continuously and automatically restart if needed.
+The bot will automatically monitor streams every 2 minutes and send notifications to your Discord channels.

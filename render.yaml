@@ -3,7 +3,7 @@ services:
     name: star-sprout-bot
     env: node
     plan: free
-    buildCommand: npm install
+    buildCommand: npm install --production
     startCommand: node index.js
     envVars:
       - key: DISCORD_BOT_TOKEN
