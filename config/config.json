@@ -17,6 +17,7 @@
   },
   "channels": {},
   "liveStreams": {},
+  "notifiedUploads": {},
   "checkInterval": 2,
   "maxRetries": 3,
   "retryDelay": 5000
