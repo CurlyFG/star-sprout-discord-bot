@@ -28,7 +28,7 @@ module.exports = {
         const platform = interaction.options.getString('platform');
         const username = interaction.options.getString('username');
         const channel = interaction.options.getChannel('channel');
-        const templates = new MessageTemplates();
+        const templates = MessageTemplates;
 
         if (!channel.isTextBased()) {
             await interaction.editReply({
