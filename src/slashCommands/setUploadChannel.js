@@ -22,15 +22,17 @@ module.exports = {
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
 
     async execute(interaction) {
+        // Immediately defer to prevent timeout
+        await interaction.deferReply();
+        
         const platform = interaction.options.getString('platform');
         const username = interaction.options.getString('username');
         const channel = interaction.options.getChannel('channel');
         const templates = new MessageTemplates();
 
         if (!channel.isTextBased()) {
-            await interaction.reply({
-                content: templates.getErrorMessage('invalidChannel', 'Please select a text channel'),
-                ephemeral: true
+            await interaction.editReply({
+                content: templates.getErrorMessage('invalidChannel', 'Please select a text channel')
             });
             return;
         }
@@ -38,22 +40,15 @@ module.exports = {
         try {
             await streamMonitor.setUploadChannel(platform, username, interaction.guild.id, channel.id);
             
-            await interaction.reply({
+            await interaction.editReply({
                 content: templates.getSuccessMessage('uploadChannelSet', 
                     `🌸 Upload notifications for ${username} will bloom in ${channel}`)
             });
         } catch (error) {
             console.error('Error setting upload channel:', error);
-            if (interaction.deferred || interaction.replied) {
-                await interaction.editReply({
-                    content: templates.getErrorMessage('uploadChannelFailed', error.message)
-                });
-            } else {
-                await interaction.reply({
-                    content: templates.getErrorMessage('uploadChannelFailed', error.message),
-                    flags: 64
-                });
-            }
+            await interaction.editReply({
+                content: templates.getErrorMessage('uploadChannelFailed', error.message)
+            });
         }
     }
 };

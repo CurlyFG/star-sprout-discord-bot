@@ -132,7 +132,8 @@ client.on('interactionCreate', async (interaction) => {
     try {
         await command.execute(interaction);
     } catch (error) {
-        logger.error('Error executing slash command:', error);
+        logger.error('Error executing slash command:', error.message || error);
+        logger.error('Stack trace:', error.stack);
         
         const errorMessage = '🥀 The bloom withers... something went wrong while processing your request.';
         
@@ -143,7 +144,7 @@ client.on('interactionCreate', async (interaction) => {
                 await interaction.reply({ content: errorMessage, flags: 64 });
             }
         } catch (replyError) {
-            logger.error('Failed to send error response:', replyError);
+            logger.error('Failed to send error response:', replyError.message || replyError);
         }
     }
 });
