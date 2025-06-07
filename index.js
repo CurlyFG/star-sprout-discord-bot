@@ -136,10 +136,14 @@ client.on('interactionCreate', async (interaction) => {
         
         const errorMessage = '🥀 The bloom withers... something went wrong while processing your request.';
         
-        if (interaction.replied || interaction.deferred) {
-            await interaction.followUp({ content: errorMessage, ephemeral: true });
-        } else {
-            await interaction.reply({ content: errorMessage, ephemeral: true });
+        try {
+            if (interaction.replied || interaction.deferred) {
+                await interaction.followUp({ content: errorMessage, flags: 64 });
+            } else {
+                await interaction.reply({ content: errorMessage, flags: 64 });
+            }
+        } catch (replyError) {
+            logger.error('Failed to send error response:', replyError);
         }
     }
 });
