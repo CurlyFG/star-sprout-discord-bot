@@ -94,6 +94,53 @@ class StarSproutBot {
             }
         }
     }
+
+    // Send upload notification
+    async sendUploadNotification(platform, uploadData, channelIds) {
+        const embed = new EmbedBuilder()
+            .setColor('#FF6B35')
+            .setTitle('🎬 A new creation blooms in the digital garden...')
+            .setDescription(`**${uploadData.displayName}** has shared a new video!\n\n*${uploadData.title}*`)
+            .addFields(
+                { name: '📹 Video Title', value: uploadData.title, inline: false },
+                { name: '📅 Published', value: `<t:${Math.floor(new Date(uploadData.publishedAt).getTime() / 1000)}:R>`, inline: true },
+                { name: '👀 Views', value: parseInt(uploadData.views).toLocaleString(), inline: true },
+                { name: '🔗 Watch Now', value: `[Open the bloom](${uploadData.url})`, inline: true }
+            )
+            .setFooter({ text: `Star Sprout • ${platform.charAt(0).toUpperCase() + platform.slice(1)} Watcher` })
+            .setTimestamp();
+
+        if (uploadData.thumbnail) {
+            embed.setImage(uploadData.thumbnail);
+        }
+
+        if (uploadData.description && uploadData.description.length > 3) {
+            embed.addFields({
+                name: '📝 Description',
+                value: uploadData.description.length > 200 ? uploadData.description.substring(0, 200) + '...' : uploadData.description,
+                inline: false
+            });
+        }
+
+        // Send to all configured channels
+        for (const channelId of channelIds) {
+            try {
+                const channel = this.client.channels.cache.get(channelId);
+                if (channel) {
+                    const message = await channel.send({ embeds: [embed] });
+                    
+                    // Add video reaction
+                    await message.react('🎬');
+                    
+                    logger.info(`Sent ${platform} upload notification for ${uploadData.displayName} to ${channel.guild.name}`);
+                } else {
+                    logger.warn(`Channel ${channelId} not found`);
+                }
+            } catch (error) {
+                logger.error(`Error sending upload notification to channel ${channelId}:`, error);
+            }
+        }
+    }
 }
 
 module.exports = StarSproutBot;

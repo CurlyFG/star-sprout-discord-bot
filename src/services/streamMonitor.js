@@ -31,6 +31,7 @@ class StreamMonitor {
                 streamers: {},
                 channels: {},
                 liveStreams: {},
+                notifiedUploads: {},
                 checkInterval: 2,
                 maxRetries: 3,
                 retryDelay: 5000
@@ -140,6 +141,7 @@ class StreamMonitor {
             // Check YouTube streams
             if (youtubeStreamers.length > 0) {
                 await this.checkYouTubeStreams(youtubeStreamers);
+                await this.checkYouTubeUploads(youtubeStreamers);
             }
 
         } catch (error) {
@@ -250,6 +252,56 @@ class StreamMonitor {
         
         if (channelIds.length > 0) {
             await this.bot.sendStreamEndedNotification(platform, streamData, channelIds);
+        }
+    }
+
+    // Check YouTube uploads
+    async checkYouTubeUploads(identifiers) {
+        try {
+            const youtubeService = require('./youtubeService');
+            const recentUploads = await youtubeService.getMultipleRecentUploads(identifiers);
+            
+            for (const upload of recentUploads) {
+                await this.handleUploadNotification('youtube', upload.username, upload);
+            }
+        } catch (error) {
+            logger.error('Error checking YouTube uploads:', error);
+        }
+    }
+
+    // Handle upload notifications
+    async handleUploadNotification(platform, username, uploadData) {
+        const key = `${platform}:${username}:${uploadData.url}`;
+        
+        // Check if we've already notified about this upload
+        if (this.config.notifiedUploads[key]) {
+            return;
+        }
+
+        // Mark as notified
+        this.config.notifiedUploads[key] = {
+            notifiedAt: Date.now(),
+            title: uploadData.title,
+            publishedAt: uploadData.publishedAt
+        };
+
+        await this.saveConfig();
+        await this.sendUploadNotifications(platform, username, uploadData);
+        
+        logger.info(`🎬 ${username} uploaded a new video on ${platform}: ${uploadData.title}`);
+    }
+
+    // Send upload notifications to all relevant channels
+    async sendUploadNotifications(platform, username, uploadData) {
+        const key = `${platform}:${username}`;
+        const streamerConfig = this.config.streamers[key];
+        
+        if (!streamerConfig) return;
+
+        const channelIds = Object.values(streamerConfig.guilds);
+        
+        if (channelIds.length > 0) {
+            await this.bot.sendUploadNotification(platform, uploadData, channelIds);
         }
     }
 }

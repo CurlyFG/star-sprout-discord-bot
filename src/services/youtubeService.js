@@ -32,7 +32,7 @@ class YouTubeService {
                 });
             }
 
-            if (response.data.items.length === 0) {
+            if (!response.data.items || response.data.items.length === 0) {
                 throw new Error(`YouTube channel '${identifier}' not found`);
             }
 
@@ -121,6 +121,59 @@ class YouTubeService {
         }
     }
 
+    // Check for recent uploads (within last 24 hours)
+    async getRecentUploads(identifier, maxResults = 5) {
+        try {
+            const channelId = await this.getChannelId(identifier);
+            const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+            const response = await axios.get(`${this.baseURL}/search`, {
+                params: {
+                    part: 'id,snippet',
+                    channelId: channelId,
+                    type: 'video',
+                    order: 'date',
+                    publishedAfter: oneDayAgo,
+                    maxResults: maxResults,
+                    key: this.apiKey
+                }
+            });
+
+            const uploads = [];
+            for (const video of response.data.items) {
+                const videoResponse = await axios.get(`${this.baseURL}/videos`, {
+                    params: {
+                        part: 'snippet,statistics',
+                        id: video.id.videoId,
+                        key: this.apiKey
+                    }
+                });
+
+                if (videoResponse.data.items.length > 0) {
+                    const videoData = videoResponse.data.items[0];
+                    uploads.push({
+                        platform: 'youtube',
+                        type: 'upload',
+                        username: identifier,
+                        displayName: video.snippet.channelTitle,
+                        title: video.snippet.title,
+                        description: video.snippet.description.substring(0, 200) + '...',
+                        publishedAt: video.snippet.publishedAt,
+                        thumbnail: video.snippet.thumbnails.medium?.url || video.snippet.thumbnails.default?.url,
+                        url: `https://www.youtube.com/watch?v=${video.id.videoId}`,
+                        views: videoData.statistics.viewCount || '0',
+                        duration: videoData.contentDetails?.duration || 'Unknown'
+                    });
+                }
+            }
+
+            return uploads;
+        } catch (error) {
+            logger.error(`Error getting recent uploads for ${identifier}:`, error.message);
+            return [];
+        }
+    }
+
     // Get multiple live streams at once
     async getMultipleLiveStreams(identifiers) {
         const streams = [];
@@ -137,6 +190,22 @@ class YouTubeService {
         }
 
         return streams;
+    }
+
+    // Get multiple recent uploads at once
+    async getMultipleRecentUploads(identifiers) {
+        const allUploads = [];
+        
+        for (const identifier of identifiers) {
+            try {
+                const uploads = await this.getRecentUploads(identifier, 3);
+                allUploads.push(...uploads);
+            } catch (error) {
+                logger.warn(`Skipping uploads check for invalid YouTube channel: ${identifier}`);
+            }
+        }
+
+        return allUploads;
     }
 }
 
