@@ -17,7 +17,7 @@ class YouTubeService {
                 response = await axios.get(`${this.baseURL}/channels`, {
                     params: {
                         part: 'id',
-                        forHandle: identifier,
+                        forHandle: identifier.substring(1), // Remove @ symbol for API
                         key: this.apiKey
                     }
                 });
