@@ -105,12 +105,17 @@ class MessageTemplates {
                 },
                 {
                     name: '📋 `!sprout list`',
-                    value: 'List all watched streamers',
+                    value: 'List all watched streamers and their channels',
                     inline: false
                 },
                 {
                     name: '🎯 `!sprout channel <#channel>`',
-                    value: 'Set notification channel for this server',
+                    value: 'Set default notification channel for this server',
+                    inline: false
+                },
+                {
+                    name: '🌿 `!sprout move <platform> <username> <#channel>`',
+                    value: 'Move a specific streamer to a different channel',
                     inline: false
                 },
                 {
