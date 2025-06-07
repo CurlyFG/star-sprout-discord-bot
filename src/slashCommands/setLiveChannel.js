@@ -47,10 +47,16 @@ module.exports = {
             });
         } catch (error) {
             console.error('Error setting live channel:', error);
-            await interaction.reply({
-                content: templates.getErrorMessage('liveChannelFailed', error.message),
-                ephemeral: true
-            });
+            if (interaction.deferred || interaction.replied) {
+                await interaction.editReply({
+                    content: templates.getErrorMessage('liveChannelFailed', error.message)
+                });
+            } else {
+                await interaction.reply({
+                    content: templates.getErrorMessage('liveChannelFailed', error.message),
+                    flags: 64
+                });
+            }
         }
     }
 };

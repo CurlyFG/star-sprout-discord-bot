@@ -44,10 +44,16 @@ module.exports = {
             });
         } catch (error) {
             console.error('Error setting upload channel:', error);
-            await interaction.reply({
-                content: templates.getErrorMessage('uploadChannelFailed', error.message),
-                ephemeral: true
-            });
+            if (interaction.deferred || interaction.replied) {
+                await interaction.editReply({
+                    content: templates.getErrorMessage('uploadChannelFailed', error.message)
+                });
+            } else {
+                await interaction.reply({
+                    content: templates.getErrorMessage('uploadChannelFailed', error.message),
+                    flags: 64
+                });
+            }
         }
     }
 };

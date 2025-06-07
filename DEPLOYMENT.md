@@ -40,3 +40,9 @@ The build error has been resolved by removing the problematic render.yaml file a
 - Themed celestial/nature notification messages
 
 The bot monitors streams every 2 minutes and sends notifications when streamers go live or upload new videos.
+
+## Recent Updates:
+- YouTube upload notifications working perfectly
+- Added separate channel support for live streams vs uploads
+- Fixed Discord interaction timeout errors
+- Twitch monitoring may need fresh token refresh after deployment

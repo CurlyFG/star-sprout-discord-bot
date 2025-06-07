@@ -27,7 +27,18 @@
   },
   "channels": {},
   "liveStreams": {},
-  "notifiedUploads": {},
+  "notifiedUploads": {
+    "youtube:@curlyfitgamer:https://www.youtube.com/watch?v=fNNhbkO08qc": {
+      "notifiedAt": 1749312841785,
+      "title": "⚔︎ Barret and Tifa were...KIDNAPPED??✧˚ ༘ ⋆ in Final Fantasy 7 (1997).",
+      "publishedAt": "2025-06-07T15:03:18Z"
+    },
+    "youtube:@curlyfitgamer:https://www.youtube.com/watch?v=NaB4qayZIKU": {
+      "notifiedAt": 1749312842244,
+      "title": "⚔︎ Barret and Tifa were...KIDNAPPED??✧˚ ༘ ⋆ in Final Fantasy 7 (1997)",
+      "publishedAt": "2025-06-07T14:25:05Z"
+    }
+  },
   "checkInterval": 2,
   "maxRetries": 3,
   "retryDelay": 5000
