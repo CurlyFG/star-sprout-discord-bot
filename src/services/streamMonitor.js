@@ -61,9 +61,17 @@ class StreamMonitor {
             };
         }
 
-        this.config.streamers[key].guilds[guildId] = channelId;
-        await this.saveConfig();
+        // For YouTube, support separate live and upload channels
+        if (platform === 'youtube') {
+            this.config.streamers[key].guilds[guildId] = {
+                liveChannel: channelId,
+                uploadChannel: channelId
+            };
+        } else {
+            this.config.streamers[key].guilds[guildId] = channelId;
+        }
         
+        await this.saveConfig();
         logger.info(`Added ${platform} streamer ${username} for guild ${guildId}`);
     }
 
@@ -92,16 +100,71 @@ class StreamMonitor {
         logger.info(`Set notification channel for guild ${guildId} to ${channelId}`);
     }
 
+    // Set live channel for YouTube/Twitch streamer
+    async setLiveChannel(platform, username, guildId, channelId) {
+        const key = `${platform}:${username}`;
+        
+        if (!this.config.streamers[key]) {
+            throw new Error(`${username} is not being monitored. Add them first with /add`);
+        }
+
+        if (platform === 'youtube') {
+            if (typeof this.config.streamers[key].guilds[guildId] === 'string') {
+                // Convert old format to new format
+                this.config.streamers[key].guilds[guildId] = {
+                    liveChannel: channelId,
+                    uploadChannel: this.config.streamers[key].guilds[guildId]
+                };
+            } else {
+                this.config.streamers[key].guilds[guildId].liveChannel = channelId;
+            }
+        } else {
+            this.config.streamers[key].guilds[guildId] = channelId;
+        }
+
+        await this.saveConfig();
+        logger.info(`Set live channel for ${platform}:${username} to ${channelId}`);
+    }
+
+    // Set upload channel for YouTube streamer
+    async setUploadChannel(platform, username, guildId, channelId) {
+        const key = `${platform}:${username}`;
+        
+        if (!this.config.streamers[key]) {
+            throw new Error(`${username} is not being monitored. Add them first with /add`);
+        }
+
+        if (platform !== 'youtube') {
+            throw new Error('Upload channels are only supported for YouTube');
+        }
+
+        if (typeof this.config.streamers[key].guilds[guildId] === 'string') {
+            // Convert old format to new format
+            this.config.streamers[key].guilds[guildId] = {
+                liveChannel: this.config.streamers[key].guilds[guildId],
+                uploadChannel: channelId
+            };
+        } else {
+            this.config.streamers[key].guilds[guildId].uploadChannel = channelId;
+        }
+
+        await this.saveConfig();
+        logger.info(`Set upload channel for ${platform}:${username} to ${channelId}`);
+    }
+
     // Get all streamers for a guild
     getStreamersForGuild(guildId) {
         const streamers = [];
         
         for (const [key, streamer] of Object.entries(this.config.streamers)) {
             if (streamer.guilds[guildId]) {
+                const guildData = streamer.guilds[guildId];
                 streamers.push({
                     platform: streamer.platform,
                     username: streamer.username,
-                    channel: streamer.guilds[guildId]
+                    channel: guildData,
+                    liveChannel: typeof guildData === 'object' ? guildData.liveChannel : guildData,
+                    uploadChannel: typeof guildData === 'object' ? guildData.uploadChannel : guildData
                 });
             }
         }
@@ -234,7 +297,15 @@ class StreamMonitor {
         
         if (!streamerConfig) return;
 
-        const channelIds = Object.values(streamerConfig.guilds);
+        const channelIds = [];
+        
+        for (const guildData of Object.values(streamerConfig.guilds)) {
+            if (typeof guildData === 'object') {
+                channelIds.push(guildData.liveChannel);
+            } else {
+                channelIds.push(guildData);
+            }
+        }
         
         if (channelIds.length > 0) {
             await this.bot.sendLiveNotification(platform, streamData, channelIds);
@@ -248,7 +319,15 @@ class StreamMonitor {
         
         if (!streamerConfig) return;
 
-        const channelIds = Object.values(streamerConfig.guilds);
+        const channelIds = [];
+        
+        for (const guildData of Object.values(streamerConfig.guilds)) {
+            if (typeof guildData === 'object') {
+                channelIds.push(guildData.liveChannel);
+            } else {
+                channelIds.push(guildData);
+            }
+        }
         
         if (channelIds.length > 0) {
             await this.bot.sendStreamEndedNotification(platform, streamData, channelIds);
@@ -298,7 +377,15 @@ class StreamMonitor {
         
         if (!streamerConfig) return;
 
-        const channelIds = Object.values(streamerConfig.guilds);
+        const channelIds = [];
+        
+        for (const guildData of Object.values(streamerConfig.guilds)) {
+            if (typeof guildData === 'object') {
+                channelIds.push(guildData.uploadChannel);
+            } else {
+                channelIds.push(guildData);
+            }
+        }
         
         if (channelIds.length > 0) {
             await this.bot.sendUploadNotification(platform, uploadData, channelIds);
