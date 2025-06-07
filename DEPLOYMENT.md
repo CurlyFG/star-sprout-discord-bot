@@ -1,21 +1,24 @@
 # Star Sprout Discord Bot - Deployment Guide
 
-## Quick Fix for Build Error (Exit Code 127)
+## Simplified Deployment (Fix for Exit Code 127)
 
-The deployment configuration has been updated to resolve the build issues:
+The build error has been resolved by removing the problematic render.yaml file and using Render's auto-detection.
 
-### Updated Files:
-- `render.yaml` - Fixed build command and Node.js configuration
-- `Procfile` - Added as backup deployment method
+### Solution Applied:
+- Removed `render.yaml` file (was causing Node.js environment conflicts)
+- Using `Procfile` for deployment commands
+- Letting Render auto-detect Node.js configuration
 
-### Deployment Steps:
+### New Deployment Steps:
 
-1. **Redeploy on Render:**
-   - Go to your Render dashboard
-   - Find your `star-sprout-bot` service
-   - Click "Manual Deploy" → "Deploy latest commit"
+1. **Create Fresh Service on Render:**
+   - Go to render.com
+   - Click "New +" → "Web Service"
+   - Connect your GitHub repository
+   - Render will auto-detect Node.js project
+   - Choose "Free" plan
 
-2. **Environment Variables (Required):**
+2. **Configure Environment Variables:**
    ```
    DISCORD_BOT_TOKEN=your_bot_token
    TWITCH_CLIENT_ID=your_twitch_client_id
@@ -24,19 +27,16 @@ The deployment configuration has been updated to resolve the build issues:
    NODE_ENV=production
    ```
 
-3. **Alternative: Create New Service:**
-   If rebuild fails, create a new web service:
-   - Select your GitHub repository
-   - Render will auto-detect the configuration
-   - Choose "Free" plan
-   - Add environment variables
-   - Deploy
+3. **Build Settings (Auto-detected):**
+   - Build Command: `npm install`
+   - Start Command: `node index.js` (from Procfile)
+   - Node.js Version: Latest stable
 
-### Features Ready:
-- ✅ Twitch live stream monitoring
-- ✅ YouTube live stream monitoring  
-- ✅ YouTube upload notifications
-- ✅ Multi-server Discord support
-- ✅ Themed notification messages
+### Ready Features:
+- Twitch live stream monitoring (curlyfitgamer, erezkigal)
+- YouTube live stream monitoring (@curlyfitgamer)
+- YouTube upload notifications (last 24 hours)
+- Multi-server Discord support
+- Themed celestial/nature notification messages
 
-The bot will automatically monitor streams every 2 minutes and send notifications to your Discord channels.
+The bot monitors streams every 2 minutes and sends notifications when streamers go live or upload new videos.
