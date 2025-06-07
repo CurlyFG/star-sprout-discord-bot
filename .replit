@@ -25,3 +25,7 @@ args = "npm install discord.js axios node-cron && node index.js"
 
 [deployment]
 run = ["sh", "-c", "npm install discord.js axios node-cron && node index.js"]
+
+[[ports]]
+localPort = 3000
+externalPort = 80

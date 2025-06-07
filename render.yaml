@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: star-sprout-bot
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node index.js
+    envVars:
+      - key: DISCORD_BOT_TOKEN
+        sync: false
+      - key: TWITCH_CLIENT_ID
+        sync: false
+      - key: TWITCH_CLIENT_SECRET
+        sync: false
+      - key: YOUTUBE_API_KEY
+        sync: false
+      - key: NODE_ENV
+        value: production
+    healthCheckPath: /health
+    numInstances: 1
+    region: oregon
+    scaling:
+      minInstances: 1
+      maxInstances: 1

@@ -1,8 +1,16 @@
 {
-    "streamers": {},
-    "channels": {},
-    "liveStreams": {},
-    "checkInterval": 2,
-    "maxRetries": 3,
-    "retryDelay": 5000
+  "streamers": {
+    "twitch:curlyfitgamer": {
+      "platform": "twitch",
+      "username": "curlyfitgamer",
+      "guilds": {
+        "1286430360544219258": "1289251766017458248"
+      }
+    }
+  },
+  "channels": {},
+  "liveStreams": {},
+  "checkInterval": 2,
+  "maxRetries": 3,
+  "retryDelay": 5000
 }
