@@ -12,14 +12,25 @@ A gentle Discord bot that monitors Twitch and YouTube streams and sends nature-t
 
 ## 🌸 Commands
 
-All commands start with `!sprout`:
+### Slash Commands (Moderator Only)
+Modern Discord slash commands with built-in permissions:
 
-- `!sprout add <platform> <username>` - Add a streamer to watch (twitch/youtube)
-- `!sprout remove <platform> <username>` - Remove a streamer from watching
-- `!sprout list` - Show all monitored streamers and their status
-- `!sprout channel <#channel>` - Set notification channel for this server
-- `!sprout intro` - Send Star Sprout's introduction message
-- `!sprout help` - Show all available commands
+- `/add <platform> <username> [channel]` - Add a streamer to watch (twitch/youtube)
+- `/remove <platform> <username>` - Remove a streamer from watching
+- `/list` - Show all monitored streamers and their status
+- `/move <platform> <username> <channel>` - Move streamer notifications to different channel
+- `/channel [target]` - Set default notification channel for this server
+
+### Legacy Prefix Commands
+For backwards compatibility, `!sprout` commands still work:
+
+- `!sprout add <platform> <username>` - Add a streamer to watch
+- `!sprout remove <platform> <username>` - Remove a streamer
+- `!sprout list` - Show monitored streamers
+- `!sprout channel <#channel>` - Set notification channel
+- `!sprout move <platform> <username> <#channel>` - Move streamer to different channel
+- `!sprout intro` - Send introduction message
+- `!sprout help` - Show command help
 
 ## 🎯 Setup
 

@@ -41,7 +41,24 @@ client.once('ready', async () => {
     
     // Deploy slash commands
     try {
-        await deploySlashCommands();
+        const commands = [];
+        const slashCommandFiles = fs.readdirSync('./src/slashCommands').filter(file => file.endsWith('.js'));
+        
+        for (const file of slashCommandFiles) {
+            const command = require(`./src/slashCommands/${file}`);
+            if (command.data) {
+                commands.push(command.data.toJSON());
+            }
+        }
+
+        const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_BOT_TOKEN);
+        
+        await rest.put(
+            Routes.applicationCommands(client.user.id),
+            { body: commands },
+        );
+
+        logger.info('🌱 Successfully registered slash commands globally!');
     } catch (error) {
         logger.error('Failed to deploy slash commands:', error);
     }
@@ -75,6 +92,28 @@ client.on('messageCreate', async (message) => {
     } catch (error) {
         logger.error('Error executing command:', error);
         message.reply('🥀 The bloom withers... something went wrong while processing your request.');
+    }
+});
+
+// Slash command interaction handling
+client.on('interactionCreate', async (interaction) => {
+    if (!interaction.isChatInputCommand()) return;
+
+    const command = client.slashCommands.get(interaction.commandName);
+    if (!command) return;
+
+    try {
+        await command.execute(interaction);
+    } catch (error) {
+        logger.error('Error executing slash command:', error);
+        
+        const errorMessage = '🥀 The bloom withers... something went wrong while processing your request.';
+        
+        if (interaction.replied || interaction.deferred) {
+            await interaction.followUp({ content: errorMessage, ephemeral: true });
+        } else {
+            await interaction.reply({ content: errorMessage, ephemeral: true });
+        }
     }
 });
 
