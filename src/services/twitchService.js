@@ -3,8 +3,8 @@ const logger = require('../utils/logger');
 
 class TwitchService {
     constructor() {
-        this.clientId = process.env.TWITCH_CLIENT_ID;
-        this.clientSecret = process.env.TWITCH_CLIENT_SECRET;
+        this.clientId = process.env.TWITCH_CLIENT_ID_NEW || process.env.TWITCH_CLIENT_ID;
+        this.clientSecret = process.env.TWITCH_CLIENT_SECRET_NEW || process.env.TWITCH_CLIENT_SECRET;
         this.accessToken = null;
         this.tokenExpiry = null;
         this.baseURL = 'https://api.twitch.tv/helix';
