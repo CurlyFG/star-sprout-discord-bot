@@ -3,7 +3,7 @@ const logger = require('../utils/logger');
 
 class YouTubeService {
     constructor() {
-        this.apiKey = process.env.YOUTUBE_API_KEY;
+        this.apiKey = process.env.YOUTUBE_API_KEY_NEW || process.env.YOUTUBE_API_KEY;
         this.baseURL = 'https://www.googleapis.com/youtube/v3';
     }
 
