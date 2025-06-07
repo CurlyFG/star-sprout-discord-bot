@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, Collection } = require('discord.js');
+const { Client, GatewayIntentBits, Collection, REST, Routes } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
 const cron = require('node-cron');
@@ -16,18 +16,35 @@ const client = new Client({
 
 // Initialize commands collection
 client.commands = new Collection();
+client.slashCommands = new Collection();
 
-// Load command files
+// Load prefix command files
 const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {
     const command = require(`./src/commands/${file}`);
     client.commands.set(command.name, command);
 }
 
+// Load slash command files
+const slashCommandFiles = fs.readdirSync('./src/slashCommands').filter(file => file.endsWith('.js'));
+for (const file of slashCommandFiles) {
+    const command = require(`./src/slashCommands/${file}`);
+    if (command.data) {
+        client.slashCommands.set(command.data.name, command);
+    }
+}
+
 // Bot ready event
-client.once('ready', () => {
+client.once('ready', async () => {
     logger.info(`🌱 Star Sprout has awakened! Logged in as ${client.user.tag}`);
     logger.info('🌿 The realm stirs with gentle light...');
+    
+    // Deploy slash commands
+    try {
+        await deploySlashCommands();
+    } catch (error) {
+        logger.error('Failed to deploy slash commands:', error);
+    }
     
     // Start stream monitoring
     streamMonitor.initialize(client);
